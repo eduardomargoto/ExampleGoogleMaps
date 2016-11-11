@@ -1,16 +1,11 @@
 package br.com.etm.exampletegooglemaps.utils;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -225,6 +220,7 @@ public class DirectionFinder {
 
         void onDirectionFinderSuccess(List<Route> routes);
     }
+
     private class DownloadRoutes extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... params) {

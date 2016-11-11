@@ -1,9 +1,16 @@
 package br.com.etm.exampletegooglemaps;
 
 
+import android.*;
+import android.Manifest;
 import android.app.ProgressDialog;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -12,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,8 +40,9 @@ import br.com.etm.exampletegooglemaps.utils.DirectionFinder.Route;
 import br.com.etm.exampletegooglemaps.utils.DirectionFinder.Step;
 
 
-
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinder.DirectionFinderListener {
+
+    private static int permsRequestCode = 200;
 
     private GoogleMap mMap;
 
@@ -46,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView tv_km;
     private TextView tv_time;
     private Button btn_find;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +84,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         return;
                     }
 
-                    String origin = et_origin.getText().toString().replaceAll(" ", "%20");
+                    String origin;
+                    if (!et_origin.getText().toString().equals(getResources().getString(R.string.my_location)))
+                        origin = et_origin.getText().toString().replaceAll(" ", "%20");
+                    else
+                        origin = mMap.getMyLocation().getLatitude() + "," + mMap.getMyLocation().getLongitude();
+
                     String destination = et_destination.getText().toString().replaceAll(" ", "%20");
                     List<LatLng> waypoints = new ArrayList<>();
 //                    waypoints.add(new LatLng(-19.540649, -40.638458)); // Marista
@@ -96,9 +112,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setTrafficEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                if (mMap.getMyLocation() == null)
+                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                else {
+                    et_origin.setText(getResources().getString(R.string.my_location));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()), 16));
+                }
+                return false;
+            }
+        });
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                String[] perms = {"android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"};
+                requestPermissions(perms, permsRequestCode);
+            }
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+
     }
 
     @Override
@@ -118,8 +159,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = (routes.size() - 1); i >= 0; i--) {
             Route route = routes.get(i);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 10));
-            distance += route.distance.value;
-            duration += route.duration.value;
+            tv_km.setText(route.distance.text);
+            tv_time.setText(route.duration.text);
+//            distance += route.distance.value;
+//            duration += route.duration.value;
 
             mMap.addMarker(new MarkerOptions()
                     .title(route.startAddress)
@@ -142,8 +185,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addPolyline(polylineOptions);
 
         }
-        tv_km.setText(distance/1000 + " km");
-        tv_time.setText(((duration/60)/60) + " horas");
+//        tv_km.setText(distance/1000 + " km");
+//        tv_time.setText(((duration/60)/60) + " horas");
 
     }
+
+
 }
