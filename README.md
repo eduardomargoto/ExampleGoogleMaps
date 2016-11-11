@@ -1,3 +1,3 @@
 # ExampleGoogleMaps
 
-Examplo de utilização do Google Maps Directions API.
+Exemplo de utilização do Google Maps Directions API.
