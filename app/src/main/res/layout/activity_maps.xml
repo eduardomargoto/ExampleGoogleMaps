@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/et_origin"
+        android:hint="Origin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/et_destination"
+        android:hint="Destinarion"
+        android:layout_below="@id/et_origin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <RelativeLayout
+        android:id="@+id/rl_painel"
+        android:layout_below="@id/et_destination"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <Button
+            android:id="@+id/bt_find"
+            android:text="Find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_km"
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@id/bt_find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_toRightOf="@id/tv_km"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <fragment android:id="@+id/map"
+        android:layout_below="@id/rl_painel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        tools:context="br.com.etm.exampletegooglemaps.MapsActivity" />
+
+
+</RelativeLayout>
+
+
+
